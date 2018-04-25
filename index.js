@@ -28,7 +28,7 @@ module.exports = function webpackStats (b, opts) {
   if (b.argv) mainBundleName = b.argv.o || b.argv.outfile || mainBundleName
 
   b.on('reset', addHooks)
-  b.on('split.pipeline', addChunk)
+  b.on('split.pipeline', function (pipeline, row, name) { addChunk(name, pipeline) })
   b.on('factor.pipeline', addChunk)
   addHooks()
 
@@ -59,7 +59,9 @@ module.exports = function webpackStats (b, opts) {
     pipeline.get('wrap').push(through(ondata, onchunkend))
 
     function onmodule (row, enc, cb) {
-      var relative = path.relative(b._options.basedir || process.cwd(), row.file)
+      var relative = !row.file
+        ? '(generated)/' + row.id
+        : path.relative(b._options.basedir || process.cwd(), row.file)
       var match = /^(\.\.\/)+(.*?)\/browserify\/(lib|node_modules)\//.exec(relative)
       if (match) {
         relative = '(browserify)/' + match[3] + '/' + relative.slice(match[0].length)
