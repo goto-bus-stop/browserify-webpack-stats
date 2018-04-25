@@ -54,7 +54,7 @@ module.exports = function webpackStats (b, opts) {
       hash: '',
       modules: [],
     }
-    var hash = crypto.createHash('sha512')
+    var hash = crypto.createHash('md5')
     pipeline.get('pack').unshift(through.obj(onmodule, onmodulesend))
     pipeline.get('wrap').push(through(ondata, onchunkend))
 
