@@ -1,8 +1,9 @@
+var fs = require('fs')
 var path = require('path')
 var crypto = require('crypto')
 var through = require('through2')
 
-module.exports = function webpackStats (b) {
+module.exports = function webpackStats (b, opts) {
   var stats = null
   var startTime
   var chunkId
@@ -21,6 +22,8 @@ module.exports = function webpackStats (b) {
     chunkId = 0
   }
 
+  var statsFileName = opts.o || 'stats.json'
+
   var mainBundleName = 'bundle.js'
   if (b.argv) mainBundleName = b.argv.o || b.argv.outfile || mainBundleName
 
@@ -34,7 +37,7 @@ module.exports = function webpackStats (b) {
 
     addChunk(mainBundleName, b.pipeline)
     b.pipeline.get('wrap').on('end', function () {
-      require('fs').writeFile('stats.json', JSON.stringify(stats, null, 2), function () {})
+      fs.writeFile(statsFileName, JSON.stringify(stats, null, 2), function () {})
     })
   }
   function addChunk (name, pipeline) {
