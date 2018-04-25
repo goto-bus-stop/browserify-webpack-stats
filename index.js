@@ -21,6 +21,9 @@ module.exports = function webpackStats (b) {
     chunkId = 0
   }
 
+  var mainBundleName = 'bundle.js'
+  if (b.argv) mainBundleName = b.argv.o || b.argv.outfile || mainBundleName
+
   b.on('reset', addHooks)
   b.on('split.pipeline', addChunk)
   b.on('factor.pipeline', addChunk)
@@ -29,7 +32,7 @@ module.exports = function webpackStats (b) {
   function addHooks () {
     init()
 
-    addChunk('bundle.js', b.pipeline)
+    addChunk(mainBundleName, b.pipeline)
     b.pipeline.get('wrap').on('end', function () {
       require('fs').writeFile('stats.json', JSON.stringify(stats, null, 2), function () {})
     })
